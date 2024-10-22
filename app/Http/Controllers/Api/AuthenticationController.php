@@ -52,4 +52,12 @@ class AuthenticationController extends Controller
         ]);
     }
 
+    public function me(Request $request)
+    {
+        $user = $request->user();
+
+        return response()->json([
+            'user' => $user,
+        ]);
+    }
 }
