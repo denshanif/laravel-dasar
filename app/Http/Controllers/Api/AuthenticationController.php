@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AuthenticationController extends Controller
 {
@@ -28,4 +28,28 @@ class AuthenticationController extends Controller
             'message' => 'You have successfully registered'
         ]);
     }
+
+    public function login(Request $request)
+    {
+        $validatedData = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        if (!auth()->attempt($validatedData)) {
+            return response()->json([
+                'error' => 'Invalid Credentials'
+            ], 401);
+        }
+
+        $user = User::where('email', $request->email)->first();
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'You have successfully logged in!',
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ]);
+    }
+
 }
